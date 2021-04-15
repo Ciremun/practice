@@ -13,9 +13,6 @@ CSOURCES = [f for f in SOURCES if f.endswith('.c')]
 CC = os.environ.get('CC')
 CFLAGS = os.environ.get('CFLAGS')
 
-if CFLAGS:
-    CFLAGS = CFLAGS.split(' ')
-
 if len(sys.argv) > 1:
     CC = sys.argv[1]
 
@@ -29,7 +26,7 @@ elif not CC:
 
 for src in CSOURCES:
     if CFLAGS:
-        command = [CC, *CFLAGS, src]
+        command = [CC, *CFLAGS.split(' '), src]
     else:
         command = [CC, src]
     filename = src[:-2]
