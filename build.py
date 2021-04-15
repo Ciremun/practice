@@ -20,7 +20,7 @@ if sys.platform == 'win32':
         sys.platform = 'linux'
     else:
         CC = 'cl.exe'
-else:
+elif CC is None:
     CC = 'gcc'
 
 for src in CSOURCES:
