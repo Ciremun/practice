@@ -43,7 +43,6 @@ class Node:
     def invert_tree(node: Node):
         if node is None:
             return
-        temp = node
         node.invert_tree(node.left)
         node.invert_tree(node.right)
         temp = node.left
