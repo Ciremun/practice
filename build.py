@@ -4,6 +4,10 @@ import subprocess
 import sys
 import os
 
+def run_command(command: str):
+    print(' '.join(command))
+    subprocess.run(command)
+
 SOURCES = os.listdir('.')
 CSOURCES = [f for f in SOURCES if f.endswith('.c')]
 CC = None
@@ -25,6 +29,4 @@ for src in CSOURCES:
         command = [CC, src, f'/Fe{filename}.exe']
     else:
         command = [CC, src, f'-o{filename}']
-
-    print(' '.join(command))
-    subprocess.run(command)
+    run_command(command)
