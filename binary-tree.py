@@ -9,6 +9,10 @@ class Node:
         self.right = None
         self.data = data
 
+    def print_order(self, order: str):
+        print(f'{order}:', end=' ')
+        getattr(self, order)(self)
+
     def __str__(self) -> str:
         return f'{self.data} - ({self.left}, {self.right})'
 
@@ -33,10 +37,16 @@ class Node:
             node.postorder(node.right)
             print(node.data, end=' ')
 
-
-def print_order(node: Node, order: str):
-    print(f'{order}:')
-    getattr(Node, order)(node)
+    @staticmethod
+    def invert_tree(node: Node):
+        if node is None:
+            return
+        temp = node
+        node.invert_tree(node.left)
+        node.invert_tree(node.right)
+        temp = node.left
+        node.left = node.right
+        node.right = temp
 
 
 root = Node(0)
@@ -44,18 +54,16 @@ root.left = Node(1)
 root.right = Node(2)
 root.left.left = Node(3)
 root.left.right = Node(4)
-root.right.left = Node(5)
-root.right.right = Node(6)
 
-line = "-"*len(str(root))
+print(f'tree:\n{root}')
 
-print(f'tree:\n{root}\n{line}')
+for o in ('inorder', 'preorder', 'postorder'):
+    root.print_order(o)
+    print()
 
-print_order(root, 'inorder')
-print(f'\n{line}')
+root.invert_tree(root)
 
-print_order(root, 'preorder')
-print(f'\n{line}')
-
-print_order(root, 'postorder')
-print(f'\n{line}')
+print(f'inverted tree:\n{root}')
+for o in ('inorder', 'preorder', 'postorder'):
+    root.print_order(o)
+    print()
