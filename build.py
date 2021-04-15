@@ -16,7 +16,7 @@ if len(sys.argv) > 1:
     CC = sys.argv[1]
 
 if sys.platform == 'win32':
-    if CC is not None and ('cl' not in CC or CC == 'clang'):
+    if CC is not None and all(c != CC for c in ('cl', 'cl.exe')):
         sys.platform = 'linux'
     else:
         CC = 'cl.exe'
