@@ -4,14 +4,20 @@ import subprocess
 import sys
 import os
 
+# TODO(#1): build from args
+
 def run_command(command: str):
     print(' '.join(command))
     subprocess.run(command)
 
 SOURCES = os.listdir('.')
+
 CSOURCES = [f for f in SOURCES if f.endswith('.c')]
 CC = os.environ.get('CC')
 CFLAGS = os.environ.get('CFLAGS')
+
+RSOURCES = [f for f in SOURCES if f.endswith('.rs')]
+RC = 'rustc'
 
 if len(sys.argv) > 1:
     CC = sys.argv[1]
@@ -35,3 +41,6 @@ for src in CSOURCES:
     else:
         command.extend((f'-o{filename}',))
     run_command(command)
+
+for src in RSOURCES:
+    run_command([RC, src])
