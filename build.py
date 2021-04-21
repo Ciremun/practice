@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import subprocess
+import traceback
 import sys
 import os
 
@@ -8,7 +9,11 @@ import os
 
 def run_command(command: str):
     print(' '.join(command))
-    subprocess.run(command)
+    try:
+        subprocess.run(command)
+    except Exception as e:
+        print(f"ERROR: command {command} failed:")
+        traceback.print_exc()
 
 SOURCES = os.listdir('.')
 
