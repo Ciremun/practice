@@ -5,3 +5,5 @@
 *.pdb
 
 binary-search
+quick-sort
+linked-list
