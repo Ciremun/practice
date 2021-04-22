@@ -11,7 +11,7 @@ CC = os.environ.get('CC')
 CFLAGS = os.environ.get('CFLAGS')
 RC = 'rustc'
 
-SOURCES = os.listdir('.')
+DIR = os.listdir('.')
 build_functions = {}
 
 
@@ -85,12 +85,10 @@ def run_command(command: str):
 
 
 def build_all():
-    CSOURCES = [f for f in SOURCES if f.endswith('.c')]
-    RSOURCES = [f for f in SOURCES if f.endswith('.rs')]
-    for src in CSOURCES:
-        build_c_source(src)
-    for src in RSOURCES:
-        build_rust_source(src)
+    SOURCES = [s for e in list(build_functions.keys())
+               for s in DIR if s.endswith(f'.{e}')]
+    for src in SOURCES:
+        build_source(src)
 
 
 def build_all_with_extension(src: str):
@@ -99,7 +97,7 @@ def build_all_with_extension(src: str):
         bf = build_functions.get(ext)
         if bf:
             sources_with_extension = [
-                s for s in SOURCES if s.endswith(f'.{ext}')]
+                s for s in DIR if s.endswith(f'.{ext}')]
             for s in sources_with_extension:
                 bf(s)
         else:
