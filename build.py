@@ -5,37 +5,53 @@ import traceback
 import sys
 import os
 
+from typing import Callable, Any
+
 # TODO(#1): build from args
-
-def run_command(command: str):
-    print(' '.join(command))
-    try:
-        subprocess.run(command)
-    except Exception as e:
-        print(f"ERROR: command {command} failed:")
-        traceback.print_exc()
-
-SOURCES = os.listdir('.')
-
-CSOURCES = [f for f in SOURCES if f.endswith('.c')]
 CC = os.environ.get('CC')
 CFLAGS = os.environ.get('CFLAGS')
-
-RSOURCES = [f for f in SOURCES if f.endswith('.rs')]
 RC = 'rustc'
 
-if len(sys.argv) > 1:
-    CC = sys.argv[1]
+build_functions = {}
 
-if sys.platform == 'win32':
-    if CC and all(c != CC for c in ('cl', 'cl.exe')):
-        sys.platform = 'linux'
+def build_function(ext: str) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        def wrapper(*args, **kwargs) -> Any:
+            return func(*args, **kwargs)
+        wrapper.__name__ = func.__name__
+        build_functions[ext] = wrapper
+        return wrapper
+    return decorator
+
+def catch_errors(func: Callable) -> Callable:
+    def wrapper(*args, **kwargs) -> Any:
+        try:
+            return func(*args, **kwargs)
+        except Exception:
+            log_error(f'function {func.__name__}({args}, {kwargs}) failed')
+            traceback.print_exc()
+    return wrapper
+
+def log_error(err: str):
+    print(f'ERROR: {err}')
+
+def build_source(src: str):
+    ext = ''
+    for char in src[::-1]:
+        if char == '.':
+            ext = ext[::-1]
+            bf = build_functions.get(ext)
+            if bf is not None:
+                bf(src)
+            else:
+                log_error(f'`{src}` unknown file extension: `.{ext}`')
+            break
+        ext += char
     else:
-        CC = 'cl.exe'
-elif not CC:
-    CC = 'gcc'
+        log_error(f'source `{src}` has no extension')
 
-for src in CSOURCES:
+@build_function('c')
+def build_c_source(src: str):
     if CFLAGS:
         command = [CC, *CFLAGS.split(' '), src]
     else:
@@ -47,5 +63,35 @@ for src in CSOURCES:
         command.extend((f'-o{filename}',))
     run_command(command)
 
-for src in RSOURCES:
+@build_function('rs')
+def build_rust_source(src: str):
     run_command([RC, src])
+
+@catch_errors
+def run_command(command: str):
+    print(' '.join(command))
+    subprocess.run(command)
+
+def build_all():
+    SOURCES = os.listdir('.')
+    CSOURCES = [f for f in SOURCES if f.endswith('.c')]
+    RSOURCES = [f for f in SOURCES if f.endswith('.rs')]
+    for src in CSOURCES:
+        build_c_source(src)
+    for src in RSOURCES:
+        build_rust_source(src)
+
+if __name__ == '__main__':
+    if sys.platform == 'win32':
+        if CC and all(c != CC for c in ('cl', 'cl.exe')):
+            sys.platform = 'linux'
+        else:
+            CC = 'cl.exe'
+    elif not CC:
+        CC = 'gcc'
+    if len(sys.argv) > 1:
+        for src in sys.argv[1:]:
+            build_source(src)
+    else:
+        build_all()
+

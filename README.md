@@ -5,5 +5,5 @@
 ## Build
 
 ```console
-$ python3 build.py [CC]
+$ python3 build.py [sources]
 ```
