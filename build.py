@@ -7,7 +7,6 @@ import os
 
 from typing import Callable, Any, Optional
 
-# TODO(#1): build from args
 CC = os.environ.get('CC')
 CFLAGS = os.environ.get('CFLAGS')
 RC = 'rustc'
