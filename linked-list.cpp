@@ -54,6 +54,10 @@ public:
 
     void insert(Node<T> *prev, T data)
     {
+        if (prev == NULL)
+        {
+            return;
+        }
         Node<T> *new_node = new Node<T>();
         new_node->data = data;
         new_node->next = prev->next;
@@ -65,6 +69,11 @@ public:
         Node<T> *new_node = new Node<T>();
         new_node->data = data;
         new_node->next = NULL;
+        if (head == NULL)
+        {
+            head = new_node;
+            return;
+        }
         Node<T> *last = head;
         while (last->next != NULL)
         {
@@ -76,7 +85,7 @@ public:
     void remove(T data)
     {
         Node<T> *temp = head;
-        if (temp->data == data)
+        if (temp != NULL && temp->data == data)
         {
             head = temp->next;
             delete temp;
@@ -95,6 +104,32 @@ public:
         prev->next = temp->next;
         delete temp;
     }
+
+    void remove_at(size_t pos)
+    {
+        if (head == NULL)
+        {
+            return;
+        }
+        Node<T> *temp = head;
+        if (pos == 0)
+        {
+            head = temp->next;
+            delete temp;
+            return;
+        }
+        for (size_t i = 0; temp != NULL && i < pos - 1; i++)
+        {
+            temp = temp->next;
+        }
+        if (temp == NULL || temp->next == NULL)
+        {
+            return;
+        }
+        Node<T> *new_next = temp->next->next;
+        delete temp->next;
+        temp->next = new_next;
+    }
 };
 
 int main()
@@ -104,8 +139,10 @@ int main()
     int_list.remove(1337);
     int_list.head->print();
 
-    SinglyLinkedList<string> str_list = SinglyLinkedList<string>("master", "dungeon");
-    str_list.remove("master");
+    SinglyLinkedList<string> str_list = SinglyLinkedList<string>("boss", "dungeon");
+    str_list.insert(str_list.head, "slave");
+    str_list.remove_at(1);
+    str_list.remove("boss");
     str_list.append("master");
     str_list.head->print();
 
