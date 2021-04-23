@@ -140,6 +140,18 @@ public:
         delete temp->next;
         temp->next = new_next;
     }
+
+    size_t size()
+    {
+        size_t count = 0;
+        Node<T> *current = head;
+        while (current != NULL)
+        {
+            current = current->next;
+            count++;
+        }
+        return count;
+    }
 };
 
 int main()
@@ -148,6 +160,7 @@ int main()
     int_list->remove(420);
     int_list->remove(1337);
     int_list->head->print();
+    cout << "int_list.size() = " << int_list->size() << endl;
 
     SinglyLinkedList<string> *str_list = new SinglyLinkedList<string>("boss", "dungeon");
     str_list->insert(str_list->head, "slave");
@@ -155,6 +168,7 @@ int main()
     str_list->remove("boss");
     str_list->append("master");
     str_list->head->print();
+    cout << "str_list.size() = " << str_list->size() << endl;
 
     delete int_list;
     delete str_list;
