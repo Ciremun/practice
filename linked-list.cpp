@@ -32,6 +32,16 @@ public:
     Node<T> *head = NULL;
 
     SinglyLinkedList() {}
+    ~SinglyLinkedList()
+    {
+        Node<T> *next = NULL;
+        while (head != NULL)
+        {
+            next = head->next;
+            delete head;
+            head = next;
+        }
+    }
 
     template <class ... Args>
     SinglyLinkedList(Args ... args)
@@ -134,17 +144,20 @@ public:
 
 int main()
 {
-    SinglyLinkedList<int> int_list = SinglyLinkedList<int>(69, 420, 1337);
-    int_list.remove(420);
-    int_list.remove(1337);
-    int_list.head->print();
+    SinglyLinkedList<int> *int_list = new SinglyLinkedList<int>(69, 420, 1337);
+    int_list->remove(420);
+    int_list->remove(1337);
+    int_list->head->print();
 
-    SinglyLinkedList<string> str_list = SinglyLinkedList<string>("boss", "dungeon");
-    str_list.insert(str_list.head, "slave");
-    str_list.remove_at(1);
-    str_list.remove("boss");
-    str_list.append("master");
-    str_list.head->print();
+    SinglyLinkedList<string> *str_list = new SinglyLinkedList<string>("boss", "dungeon");
+    str_list->insert(str_list->head, "slave");
+    str_list->remove_at(1);
+    str_list->remove("boss");
+    str_list->append("master");
+    str_list->head->print();
+
+    delete int_list;
+    delete str_list;
 
     return 0;
 }
