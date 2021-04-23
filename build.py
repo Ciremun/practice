@@ -130,9 +130,9 @@ def build_all_with_extension(src: str):
 
 
 if __name__ == '__main__':
-    if not CC: 
+    if not CC:
         CC = 'cl.exe' if sys.platform == 'win32' else 'gcc'
-    if not CXX:     
+    if not CXX:
         CXX = 'cl.exe' if sys.platform == 'win32' else 'g++'
     if len(sys.argv) > 1:
         for src in sys.argv[1:]:
