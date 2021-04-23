@@ -104,7 +104,7 @@ def build_cpp_source(src: str):
 
 
 @catch_errors
-def run_command(command: str):
+def run_command(command: List[str]):
     print(' '.join(command))
     subprocess.run(command)
 
