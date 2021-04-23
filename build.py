@@ -21,7 +21,7 @@ compilers_and_flags = {
 
 
 def msvc(C: str):
-    return all(C != cl for cl in 'cl', 'cl.exe')
+    return any(C == cl for cl in 'cl', 'cl.exe')
 
 
 def build_function(ext: str) -> Callable:
@@ -125,10 +125,10 @@ def build_all_with_extension(src: str):
 
 
 if __name__ == '__main__':
-    if not CC:
-        CC = 'gcc'
-    if not CXX:
-        CXX = 'g++'
+    if not CC: 
+        CC = 'cl.exe' if sys.platform == 'win32' else 'gcc'
+    if not CXX:     
+        CXX = 'cl.exe' if sys.platform == 'win32' else 'g++'
     if len(sys.argv) > 1:
         for src in sys.argv[1:]:
             if src.startswith('*.'):
