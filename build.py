@@ -20,8 +20,8 @@ compilers_and_flags = {
 }
 
 
-def not_msvc(C: str):
-    return #TODO
+def msvc(C: str):
+    return all(C != cl for cl in 'cl', 'cl.exe')
 
 
 def build_function(ext: str) -> Callable:
@@ -81,7 +81,7 @@ def build_c_source(src: str, C: str = 'CC'):
     command = get_compiler_command(C)
     command.extend(src)
     filename = src[:-2]
-    if sys.platform == 'win32':
+    if msvc(C):
         command.extend((f'/Fe{filename}.exe',))
     else:
         command.extend((f'-o{filename}',))
@@ -124,21 +124,11 @@ def build_all_with_extension(src: str):
             log_error(f'`{src}` unknown file extension: `.{ext}`')
 
 
-def set_cc_and_cxx():
-    if sys.platform == 'win32':
-        if (CC or CXX) and all(c != CC or c != CXX for c in ('cl', 'cl.exe')):
-            sys.platform = 'linux'
-        else:
-            CC = 'cl.exe'
-    else:
-        if not CC:
-            CC = 'gcc'
-        if not CXX:
-            CXX = 'g++'
-
-
 if __name__ == '__main__':
-    set_cc_and_cxx()
+    if not CC:
+        CC = 'gcc'
+    if not CXX:
+        CXX = 'g++'
     if len(sys.argv) > 1:
         for src in sys.argv[1:]:
             if src.startswith('*.'):
