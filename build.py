@@ -5,14 +5,23 @@ import traceback
 import sys
 import os
 
-from typing import Callable, Any, Optional
+from typing import Callable, Any, Optional, List
 
-CC = os.environ.get('CC')
-CFLAGS = os.environ.get('CFLAGS')
+for v in 'CC', 'CFLAGS', 'CXX', 'CXXFLAGS':
+    setattr(sys.modules[__name__], v, os.environ.get(v))
+
 RC = 'rustc'
 
 DIR = os.listdir('.')
 build_functions = {}
+compilers_and_flags = {
+    CC: CFLAGS,
+    CXX: CXXFLAGS
+}
+
+
+def not_msvc(C: str):
+    return #TODO
 
 
 def build_function(ext: str) -> Callable:
@@ -59,12 +68,18 @@ def build_source(src: str):
             log_error(f'`{src}` unknown file extension: `.{ext}`')
 
 
-@build_function('c')
-def build_c_source(src: str):
-    if CFLAGS:
-        command = [CC, *CFLAGS.split(' '), src]
+def get_compiler_command(C: str) -> List[str]:
+    flags = compilers_and_flags[C]
+    if flags:
+        return [C, *flags.split(' ')]
     else:
-        command = [CC, src]
+        return [C]
+
+
+@build_function('c')
+def build_c_source(src: str, C: str = 'CC'):
+    command = get_compiler_command(C)
+    command.extend(src)
     filename = src[:-2]
     if sys.platform == 'win32':
         command.extend((f'/Fe{filename}.exe',))
@@ -76,6 +91,11 @@ def build_c_source(src: str):
 @build_function('rs')
 def build_rust_source(src: str):
     run_command([RC, src])
+
+
+@build_function('cpp')
+def build_cpp_source(src: str):
+    build_c_source(src, 'CXX')
 
 
 @catch_errors
@@ -104,14 +124,21 @@ def build_all_with_extension(src: str):
             log_error(f'`{src}` unknown file extension: `.{ext}`')
 
 
-if __name__ == '__main__':
+def set_cc_and_cxx():
     if sys.platform == 'win32':
-        if CC and all(c != CC for c in ('cl', 'cl.exe')):
+        if (CC or CXX) and all(c != CC or c != CXX for c in ('cl', 'cl.exe')):
             sys.platform = 'linux'
         else:
             CC = 'cl.exe'
-    elif not CC:
-        CC = 'gcc'
+    else:
+        if not CC:
+            CC = 'gcc'
+        if not CXX:
+            CXX = 'g++'
+
+
+if __name__ == '__main__':
+    set_cc_and_cxx()
     if len(sys.argv) > 1:
         for src in sys.argv[1:]:
             if src.startswith('*.'):
