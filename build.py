@@ -15,13 +15,14 @@ RC = 'rustc'
 DIR = os.listdir('.')
 build_functions = {}
 compilers_and_flags = {
-    CC: CFLAGS,
-    CXX: CXXFLAGS
+    'CC': CFLAGS,
+    'CXX': CXXFLAGS
 }
 
 
 def msvc(C: str):
-    return any(C == cl for cl in 'cl', 'cl.exe')
+    C = getattr(sys.modules[__name__], C)
+    return any(C == cl for cl in ('cl', 'cl.exe'))
 
 
 def build_function(ext: str) -> Callable:
@@ -52,7 +53,10 @@ def extract_source_extension(src: str) -> Optional[str]:
     ext = ''
     for char in src[::-1]:
         if char == '.':
-            return ext[::-1]
+            ext = ext[::-1]
+            if not ext:
+                break
+            return ext
         ext += char
     log_error(f'source `{src}` has no extension')
     return None
@@ -70,6 +74,7 @@ def build_source(src: str):
 
 def get_compiler_command(C: str) -> List[str]:
     flags = compilers_and_flags[C]
+    C = getattr(sys.modules[__name__], C)
     if flags:
         return [C, *flags.split(' ')]
     else:
@@ -79,8 +84,8 @@ def get_compiler_command(C: str) -> List[str]:
 @build_function('c')
 def build_c_source(src: str, C: str = 'CC'):
     command = get_compiler_command(C)
-    command.extend(src)
-    filename = src[:-2]
+    command.append(src)
+    filename = src[:-len(extract_source_extension(src))-1]
     if msvc(C):
         command.extend((f'/Fe{filename}.exe',))
     else:
