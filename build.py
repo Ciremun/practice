@@ -129,17 +129,24 @@ def build_all_with_extension(src: str):
             log_error(f'`{src}` unknown file extension: `.{ext}`')
 
 
+def add_compiler_flag(C: str, flag: str):
+    flags = compilers_and_flags[C]
+    if flags is None:
+        flags = flag
+    elif flag not in flags:
+        flags += f' {flag}'
+    compilers_and_flags[C] = flags
+
+
 if __name__ == '__main__':
     if not CC:
         CC = 'cl.exe' if sys.platform == 'win32' else 'gcc'
     if not CXX:
         CXX = 'cl.exe' if sys.platform == 'win32' else 'g++'
-    if sys.platform == 'win32' and msvc('CXX'):
-        CXXFLAGS = compilers_and_flags['CXX']
-        if CXXFLAGS is None:
-            CXXFLAGS = ''
-        CXXFLAGS += ' /std:c++17'
-        compilers_and_flags['CXX'] = CXXFLAGS
+    if msvc('CXX'):
+        add_compiler_flag('CXX', '/std:c++17')
+    else:
+        add_compiler_flag('CXX', '-std=c++17')
     if len(sys.argv) > 1:
         for src in sys.argv[1:]:
             if src.startswith('*.'):
