@@ -10,8 +10,8 @@ public:
     Node *next;
 
     Node() {}
-    Node(const T &val, Node<T>* nxt) : next(nxt), data(val) {}
-    Node(T &&val, Node<T>* nxt) : next(nxt), data(forward<T>(val)) {}
+    Node(const T &val, Node<T> *nxt) : next(nxt), data(val) {}
+    Node(T &&val, Node<T> *nxt) : next(nxt), data(forward<T>(val)) {}
 
     void print()
     {
@@ -46,12 +46,7 @@ public:
     template <class... Args>
     SinglyLinkedList(Args... args)
     {
-        const int size = sizeof...(args);
-        T a[size] = {args...};
-        for (int i = size - 1; i >= 0; i--)
-        {
-            this->push(a[i]);
-        }
+        ([&](auto &&input) { this->append(input); }(args), ...);
     }
 
     void push(T data)
@@ -195,7 +190,7 @@ public:
         return temp;
     }
 
-    bool operator==(const SinglyLinkedList<T>& other)
+    bool operator==(const SinglyLinkedList<T> &other)
     {
         Node<T> *left = head;
         Node<T> *right = other.head;
@@ -215,7 +210,7 @@ public:
         return true;
     }
 
-    bool operator!=(const SinglyLinkedList<T>& other)
+    bool operator!=(const SinglyLinkedList<T> &other)
     {
         return !(*this == other);
     }
