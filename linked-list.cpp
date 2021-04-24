@@ -181,7 +181,7 @@ public:
         return false;
     }
 
-    Node<T> *at(size_t idx)
+    const Node<T> *operator[](size_t idx) const
     {
         if (idx == 0)
         {
@@ -194,6 +194,31 @@ public:
         }
         return temp;
     }
+
+    bool operator==(const SinglyLinkedList<T>& other)
+    {
+        Node<T> *left = head;
+        Node<T> *right = other.head;
+        while (left != NULL && right != NULL)
+        {
+            if (left->data != right->data)
+            {
+                return false;
+            }
+            left = left->next;
+            right = right->next;
+        }
+        if (left != NULL || right != NULL)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    bool operator!=(const SinglyLinkedList<T>& other)
+    {
+        return !(*this == other);
+    }
 };
 
 int main()
@@ -204,7 +229,7 @@ int main()
     int_list->print();
     cout << "size: " << int_list->size() << endl;
     cout << "contains `420`: " << int_list->contains(420) << endl;
-    cout << "int_list[0]: " << int_list->at(0)->data << endl;
+    cout << "int_list[0]: " << (*int_list)[0]->data << endl;
     cout << endl;
 
     SinglyLinkedList<string> *str_list = new SinglyLinkedList<string>("boss", "dungeon");
@@ -215,7 +240,7 @@ int main()
     str_list->print();
     cout << "size: " << str_list->size() << endl;
     cout << "contains `master`: " << str_list->contains("master") << endl;
-    cout << "str_list[1]: " << str_list->at(1)->data << endl;
+    cout << "str_list[1]: " << (*str_list)[1]->data << endl;
     cout << endl;
 
     SinglyLinkedList<float> *float_list = new SinglyLinkedList<float>(69.5f, 420.5f, 1337.5f);
@@ -225,9 +250,19 @@ int main()
     cout << "reversed: \t";
     float_list->print();
 
+    SinglyLinkedList<bool> *bool_list = new SinglyLinkedList<bool>(true, true, false);
+    SinglyLinkedList<bool> *bool_list_2 = new SinglyLinkedList<bool>(true, false, false);
+
+    cout << "bool_list != bool_list_2: " << (*bool_list != *bool_list_2) << endl;
+    bool_list_2->insert(bool_list_2->head, true);
+    bool_list_2->remove_at(2);
+    cout << "bool_list == bool_list_2: " << (*bool_list == *bool_list_2) << endl;
+
     delete int_list;
     delete str_list;
     delete float_list;
+    delete bool_list;
+    delete bool_list_2;
 
     return 0;
 }
