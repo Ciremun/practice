@@ -10,8 +10,8 @@ public:
     Node *next;
 
     Node() {}
-    Node(const T &val) : next(nullptr), data(val) {}
-    Node(T &&val) : next(nullptr), data(forward<T>(val)) {}
+    Node(const T &val, Node<T>* nxt) : next(nxt), data(val) {}
+    Node(T &&val, Node<T>* nxt) : next(nxt), data(forward<T>(val)) {}
 
     void print()
     {
@@ -56,9 +56,7 @@ public:
 
     void push(T data)
     {
-        Node<T> *new_node = new Node<T>();
-        new_node->data = data;
-        new_node->next = head;
+        Node<T> *new_node = new Node<T>(move(data), head);
         head = new_node;
     }
 
@@ -68,17 +66,13 @@ public:
         {
             return;
         }
-        Node<T> *new_node = new Node<T>();
-        new_node->data = data;
-        new_node->next = prev->next;
+        Node<T> *new_node = new Node<T>(move(data), prev->next);
         prev->next = new_node;
     }
 
     void append(T data)
     {
-        Node<T> *new_node = new Node<T>();
-        new_node->data = data;
-        new_node->next = NULL;
+        Node<T> *new_node = new Node<T>(move(data), NULL);
         if (head == NULL)
         {
             head = new_node;
@@ -210,7 +204,7 @@ int main()
     int_list->print();
     cout << "size: " << int_list->size() << endl;
     cout << "contains `420`: " << int_list->contains(420) << endl;
-    cout << "list[1]: " << int_list->at(0)->data << endl;
+    cout << "int_list[0]: " << int_list->at(0)->data << endl;
     cout << endl;
 
     SinglyLinkedList<string> *str_list = new SinglyLinkedList<string>("boss", "dungeon");
@@ -221,7 +215,7 @@ int main()
     str_list->print();
     cout << "size: " << str_list->size() << endl;
     cout << "contains `master`: " << str_list->contains("master") << endl;
-    cout << "list[1]: " << str_list->at(1)->data << endl;
+    cout << "str_list[1]: " << str_list->at(1)->data << endl;
     cout << endl;
 
     SinglyLinkedList<float> *float_list = new SinglyLinkedList<float>(69.5f, 420.5f, 1337.5f);
