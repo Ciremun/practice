@@ -10,8 +10,8 @@ public:
     Node *next;
 
     Node() {}
-    Node(const T& val) : next(nullptr), data(val) {}
-    Node(T&& val) : next(nullptr), data(forward<T>(val)) {}
+    Node(const T &val) : next(nullptr), data(val) {}
+    Node(T &&val) : next(nullptr), data(forward<T>(val)) {}
 
     void print()
     {
@@ -43,8 +43,8 @@ public:
         }
     }
 
-    template <class ... Args>
-    SinglyLinkedList(Args ... args)
+    template <class... Args>
+    SinglyLinkedList(Args... args)
     {
         const int size = sizeof...(args);
         T a[size] = {args...};
@@ -115,20 +115,20 @@ public:
         delete temp;
     }
 
-    void remove_at(size_t pos)
+    void remove_at(size_t idx)
     {
         if (head == NULL)
         {
             return;
         }
         Node<T> *temp = head;
-        if (pos == 0)
+        if (idx == 0)
         {
             head = temp->next;
             delete temp;
             return;
         }
-        for (size_t i = 0; temp != NULL && i < pos - 1; i++)
+        for (size_t i = 0; temp != NULL && i < idx - 1; i++)
         {
             temp = temp->next;
         }
@@ -166,6 +166,20 @@ public:
         }
         return false;
     }
+
+    Node<T>* at(size_t idx)
+    {
+        if (idx == 0)
+        {
+            return head;
+        }
+        Node<T> *temp = head;
+        for (size_t i = 1; temp != NULL && i <= idx; i++)
+        {
+            temp = temp->next;
+        }
+        return temp;
+    }
 };
 
 int main()
@@ -176,6 +190,7 @@ int main()
     int_list->head->print();
     cout << "size: " << int_list->size() << endl;
     cout << "contains `420`: " << int_list->contains(420) << endl;
+    cout << "list[1]: " << int_list->at(0)->data << endl;
 
     cout << endl;
 
@@ -187,6 +202,7 @@ int main()
     str_list->head->print();
     cout << "size: " << str_list->size() << endl;
     cout << "contains `master`: " << str_list->contains("master") << endl;
+    cout << "list[1]: " << str_list->at(1)->data << endl;
 
     delete int_list;
     delete str_list;
