@@ -7,7 +7,7 @@ import os
 
 from typing import Callable, Any, Optional, List
 
-for v in 'CC', 'CFLAGS', 'CXX', 'CXXFLAGS':
+for v in 'CC', 'CXX':
     setattr(sys.modules[__name__], v, os.environ.get(v))
 
 RC = 'rustc'
@@ -15,8 +15,8 @@ RC = 'rustc'
 DIR = os.listdir('.')
 build_functions = {}
 compilers_and_flags = {
-    'CC': CFLAGS,
-    'CXX': CXXFLAGS
+    'CC': os.environ.get('CFLAGS'),
+    'CXX': os.environ.get('CXXFLAGS')
 }
 
 
@@ -134,6 +134,12 @@ if __name__ == '__main__':
         CC = 'cl.exe' if sys.platform == 'win32' else 'gcc'
     if not CXX:
         CXX = 'cl.exe' if sys.platform == 'win32' else 'g++'
+    if sys.platform == 'win32' and msvc('CXX'):
+        CXXFLAGS = compilers_and_flags['CXX']
+        if CXXFLAGS is None:
+            CXXFLAGS = ''
+        CXXFLAGS += ' /std:c++17'
+        compilers_and_flags['CXX'] = CXXFLAGS
     if len(sys.argv) > 1:
         for src in sys.argv[1:]:
             if src.startswith('*.'):
