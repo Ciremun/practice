@@ -141,6 +141,26 @@ public:
         temp->next = new_next;
     }
 
+    void reverse()
+    {
+        Node<T> *prev = NULL;
+        Node<T> *current = head;
+        Node<T> *next = NULL;
+        while (current != NULL)
+        {
+            next = current->next;
+            current->next = prev;
+            prev = current;
+            current = next;
+        }
+        head = prev;
+    }
+
+    void print()
+    {
+        head->print();
+    }
+
     size_t size()
     {
         size_t count = 0;
@@ -167,7 +187,7 @@ public:
         return false;
     }
 
-    Node<T>* at(size_t idx)
+    Node<T> *at(size_t idx)
     {
         if (idx == 0)
         {
@@ -187,11 +207,10 @@ int main()
     SinglyLinkedList<int> *int_list = new SinglyLinkedList<int>(69, 420, 1337);
     int_list->remove(420);
     int_list->remove(1337);
-    int_list->head->print();
+    int_list->print();
     cout << "size: " << int_list->size() << endl;
     cout << "contains `420`: " << int_list->contains(420) << endl;
     cout << "list[1]: " << int_list->at(0)->data << endl;
-
     cout << endl;
 
     SinglyLinkedList<string> *str_list = new SinglyLinkedList<string>("boss", "dungeon");
@@ -199,13 +218,22 @@ int main()
     str_list->remove_at(1);
     str_list->remove("boss");
     str_list->append("master");
-    str_list->head->print();
+    str_list->print();
     cout << "size: " << str_list->size() << endl;
     cout << "contains `master`: " << str_list->contains("master") << endl;
     cout << "list[1]: " << str_list->at(1)->data << endl;
+    cout << endl;
+
+    SinglyLinkedList<float> *float_list = new SinglyLinkedList<float>(69.5f, 420.5f, 1337.5f);
+    cout << "float_list: \t";
+    float_list->print();
+    float_list->reverse();
+    cout << "reversed: \t";
+    float_list->print();
 
     delete int_list;
     delete str_list;
+    delete float_list;
 
     return 0;
 }
