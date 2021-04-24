@@ -152,6 +152,20 @@ public:
         }
         return count;
     }
+
+    bool contains(T data)
+    {
+        Node<T> *current = head;
+        while (current != NULL)
+        {
+            if (current->data == data)
+            {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
 };
 
 int main()
@@ -160,7 +174,10 @@ int main()
     int_list->remove(420);
     int_list->remove(1337);
     int_list->head->print();
-    cout << "int_list.size() = " << int_list->size() << endl;
+    cout << "size: " << int_list->size() << endl;
+    cout << "contains `420`: " << int_list->contains(420) << endl;
+
+    cout << endl;
 
     SinglyLinkedList<string> *str_list = new SinglyLinkedList<string>("boss", "dungeon");
     str_list->insert(str_list->head, "slave");
@@ -168,7 +185,8 @@ int main()
     str_list->remove("boss");
     str_list->append("master");
     str_list->head->print();
-    cout << "str_list.size() = " << str_list->size() << endl;
+    cout << "size: " << str_list->size() << endl;
+    cout << "contains `master`: " << str_list->contains("master") << endl;
 
     delete int_list;
     delete str_list;
