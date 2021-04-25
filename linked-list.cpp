@@ -142,6 +142,33 @@ public:
         delete temp;
     }
 
+    void remove_node(const Node<Types...> *target)
+    {
+        if (target == NULL)
+        {
+            return;
+        }
+        if (target == head)
+        {
+            head = target->next;
+            delete target;
+            return;
+        }
+        Node<Types...> *temp = head;
+        Node<Types...> *prev = NULL;
+        while (temp != NULL && temp != target)
+        {
+            prev = temp;
+            temp = temp->next;
+        }
+        if (temp == NULL)
+        {
+            return;
+        }
+        prev->next = temp->next;
+        delete temp;
+    }
+
     void remove_at(size_t idx)
     {
         if (head == NULL)
@@ -278,8 +305,12 @@ int main()
     cout << "(*list_1)[2] == `dungeon master`: " << (get<string>(list_1->at(2)->data) == string("dungeon master")) << endl;
     cout << "size: " << list_1->size() << endl;
     cout << "contains `420.5f`: " << list_1->contains(420.5f) << endl;
-    cout << "print list_1[0]: ";
-    (*list_1)[0]->print_self();
+    cout << "print list_1[1]: ";
+    auto *node = (*list_1)[1];
+    node->print_self();
+    cout << "remove list_1[1] by ptr" << endl;
+    list_1->remove_node(node);
+    list_1->print();
     cout << endl;
 
     auto *list_2 = new SinglyLinkedList<string>(string("boss"), string("dungeon"));
