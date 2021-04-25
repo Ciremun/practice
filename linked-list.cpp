@@ -6,10 +6,11 @@ using namespace std;
 template <typename T>
 using base_type = typename remove_cv<typename remove_reference<T>::type>::type;
 
+template <typename... Types>
 class Node
 {
 public:
-    using Data = variant<int, float, string, bool>;
+    using Data = variant<Types...>;
     Data data;
     Node *next;
 
@@ -26,7 +27,7 @@ public:
         Node *node = this;
         while (node != NULL)
         {
-            visit([](auto&&val){ cout << val << " "; }, node->data);
+            visit([](auto &&val) { cout << val << " "; }, node->data);
             node = node->next;
         }
         cout << endl;
@@ -34,19 +35,20 @@ public:
 
     void print_self() const
     {
-        visit([](auto &&val){ cout << val << endl; }, data);
+        visit([](auto &&val) { cout << val << endl; }, data);
     }
 };
 
+template <typename... Types>
 class SinglyLinkedList
 {
 public:
-    Node *head = NULL;
+    Node<Types...> *head = NULL;
 
     SinglyLinkedList() {}
     ~SinglyLinkedList()
     {
-        Node *next = NULL;
+        Node<Types...> *next = NULL;
         while (head != NULL)
         {
             next = head->next;
@@ -55,7 +57,7 @@ public:
         }
     }
 
-    template <class... Args>
+    template <typename... Args>
     SinglyLinkedList(Args... args)
     {
         ([&](auto &&input) { this->append(input); }(args), ...);
@@ -64,31 +66,31 @@ public:
     template <typename T>
     void push(T data)
     {
-        Node *new_node = new Node(move(data), head);
+        Node<Types...> *new_node = new Node<Types...>(move(data), head);
         head = new_node;
     }
 
     template <typename T>
-    void insert(Node *prev, T data)
+    void insert(Node<Types...> *prev, T data)
     {
         if (prev == NULL)
         {
             return;
         }
-        Node *new_node = new Node(move(data), prev->next);
+        Node<Types...> *new_node = new Node<Types...>(move(data), prev->next);
         prev->next = new_node;
     }
 
     template <typename T>
     void append(T data)
     {
-        Node *new_node = new Node(move(data), NULL);
+        Node<Types...> *new_node = new Node<Types...>(move(data), NULL);
         if (head == NULL)
         {
             head = new_node;
             return;
         }
-        Node *last = head;
+        Node<Types...> *last = head;
         while (last->next != NULL)
         {
             last = last->next;
@@ -99,7 +101,7 @@ public:
     template <typename T>
     void remove(T data)
     {
-        Node *temp = head;
+        Node<Types...> *temp = head;
         if (temp != NULL && visit([&data](auto &&val) -> bool {
                 if constexpr (is_same_v<T, base_type<decltype(val)>>)
                 {
@@ -109,23 +111,25 @@ public:
                 {
                     return false;
                 }
-            }, temp->data))
+            },
+                                  temp->data))
         {
             head = temp->next;
             delete temp;
             return;
         }
-        Node *prev = NULL;
+        Node<Types...> *prev = NULL;
         while (temp != NULL && visit([&data](auto &&val) -> bool {
-            if constexpr (is_same_v<T, base_type<decltype(val)>>)
-            {
-                return val != data;
-            }
-            else
-            {
-                return true;
-            }
-        }, temp->data))
+                   if constexpr (is_same_v<T, base_type<decltype(val)>>)
+                   {
+                       return val != data;
+                   }
+                   else
+                   {
+                       return true;
+                   }
+               },
+                                     temp->data))
         {
             prev = temp;
             temp = temp->next;
@@ -144,7 +148,7 @@ public:
         {
             return;
         }
-        Node *temp = head;
+        Node<Types...> *temp = head;
         if (idx == 0)
         {
             head = temp->next;
@@ -159,16 +163,16 @@ public:
         {
             return;
         }
-        Node *new_next = temp->next->next;
+        Node<Types...> *new_next = temp->next->next;
         delete temp->next;
         temp->next = new_next;
     }
 
     void reverse()
     {
-        Node *prev = NULL;
-        Node *current = head;
-        Node *next = NULL;
+        Node<Types...> *prev = NULL;
+        Node<Types...> *current = head;
+        Node<Types...> *next = NULL;
         while (current != NULL)
         {
             next = current->next;
@@ -187,7 +191,7 @@ public:
     size_t size()
     {
         size_t count = 0;
-        Node *current = head;
+        Node<Types...> *current = head;
         while (current != NULL)
         {
             current = current->next;
@@ -199,7 +203,7 @@ public:
     template <typename T>
     bool contains(T data)
     {
-        Node *current = head;
+        Node<Types...> *current = head;
         while (current != NULL)
         {
             if (visit([&data](auto &&val) -> bool {
@@ -211,7 +215,8 @@ public:
                     {
                         return false;
                     }
-                }, current->data))
+                },
+                      current->data))
             {
                 return true;
             }
@@ -220,13 +225,13 @@ public:
         return false;
     }
 
-    const Node *operator[](size_t idx) const
+    const Node<Types...> *operator[](size_t idx) const
     {
         if (idx == 0)
         {
             return head;
         }
-        Node *temp = head;
+        Node<Types...> *temp = head;
         for (size_t i = 1; temp != NULL && i <= idx; i++)
         {
             temp = temp->next;
@@ -236,8 +241,8 @@ public:
 
     bool operator==(const SinglyLinkedList &other)
     {
-        Node *left = head;
-        Node *right = other.head;
+        Node<Types...> *left = head;
+        Node<Types...> *right = other.head;
         while (left != NULL && right != NULL)
         {
             if (left->data != right->data)
@@ -262,7 +267,7 @@ public:
 
 int main()
 {
-    SinglyLinkedList *list_1 = new SinglyLinkedList(69, 420.5f, string("dungeon master"));
+    auto *list_1 = new SinglyLinkedList<int, float, string>(69, 420.5f, string("dungeon master"));
     list_1->print();
     cout << "size: " << list_1->size() << endl;
     cout << "contains `420.5f`: " << list_1->contains(420.5f) << endl;
@@ -270,7 +275,7 @@ int main()
     (*list_1)[0]->print_self();
     cout << endl;
 
-    SinglyLinkedList *list_2 = new SinglyLinkedList(string("boss"), string("dungeon"));
+    auto *list_2 = new SinglyLinkedList<string>(string("boss"), string("dungeon"));
     list_2->insert(list_2->head, string("slave"));
     list_2->remove_at(1);
     list_2->remove(string("boss"));
@@ -282,7 +287,7 @@ int main()
     (*list_2)[1]->print_self();
     cout << endl;
 
-    SinglyLinkedList *list_3 = new SinglyLinkedList(false, string("second"), 3, 3.5f);
+    auto *list_3 = new SinglyLinkedList<bool, string, int, float>(false, string("second"), 3, 3.5f);
     cout << "list_3: \t";
     list_3->print();
     list_3->reverse();
@@ -290,8 +295,8 @@ int main()
     list_3->print();
     cout << endl;
 
-    SinglyLinkedList *bool_list = new SinglyLinkedList(true, true, false);
-    SinglyLinkedList *bool_list_2 = new SinglyLinkedList(true, false, false);
+    auto *bool_list = new SinglyLinkedList<bool>(true, true, false);
+    auto *bool_list_2 = new SinglyLinkedList<bool>(true, false, false);
 
     bool_list->print();
     bool_list_2->print();
