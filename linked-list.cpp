@@ -101,6 +101,11 @@ public:
     template <typename T>
     void remove(T data)
     {
+        if constexpr (is_same_v<T, const Node<Types...>*>)
+        {
+            remove_node(data);
+            return;
+        }
         Node<Types...> *temp = head;
         if (temp != NULL && visit([&data](auto &&val) -> bool {
                 if constexpr (is_same_v<T, base_type<decltype(val)>>)
@@ -309,7 +314,7 @@ int main()
     auto *node = (*list_1)[1];
     node->print_self();
     cout << "remove list_1[1] by ptr" << endl;
-    list_1->remove_node(node);
+    list_1->remove(node);
     list_1->print();
     cout << endl;
 
