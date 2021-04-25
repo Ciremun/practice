@@ -4,7 +4,7 @@
 using namespace std;
 
 template<typename T>
-using base_type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+using base_type = typename remove_cv<typename remove_reference<T>::type>::type;
 
 enum class type
 {
