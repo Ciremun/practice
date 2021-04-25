@@ -200,6 +200,11 @@ public:
         return count;
     }
 
+    const Node<Types...> *at(size_t idx)
+    {
+        return operator[](idx);
+    }
+
     template <typename T>
     bool contains(T data)
     {
@@ -267,8 +272,11 @@ public:
 
 int main()
 {
-    auto *list_1 = new SinglyLinkedList<int, float, string>(69, 420.5f, string("dungeon master"));
+    using SLL = SinglyLinkedList<int, float, string>;
+    auto *list_1 = new SLL(69, 420.5f, string("dungeon master"));
     list_1->print();
+
+    cout << "(*list_1)[2] == `dungeon master`: " << (get<string>(list_1->at(2)->data) == string("dungeon master")) << endl;
     cout << "size: " << list_1->size() << endl;
     cout << "contains `420.5f`: " << list_1->contains(420.5f) << endl;
     cout << "list_1[0]: ";
