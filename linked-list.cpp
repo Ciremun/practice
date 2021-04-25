@@ -101,7 +101,7 @@ public:
     template <typename T>
     void remove(T data)
     {
-        if constexpr (is_same_v<T, const Node<Types...>*>)
+        if constexpr (is_same_v<T, const Node<Types...> *>)
         {
             remove_node(data);
             return;
@@ -304,64 +304,34 @@ public:
 
 int main()
 {
-    using SLL = SinglyLinkedList<int, float, string>;
+    using SLL = SinglyLinkedList<int, float, string, bool>;
     auto *list_1 = new SLL(69, 420.5f, string("dungeon master"));
     list_1->print();
     cout << "(*list_1)[2] == `dungeon master`: " << (get<string>(list_1->at(2)->data) == string("dungeon master")) << endl;
     cout << "size: " << list_1->size() << endl;
     cout << "contains `420.5f`: " << list_1->contains(420.5f) << endl;
     cout << "print list_1[1]: ";
-    auto *node = (*list_1)[1];
-    node->print_self();
+    (*list_1)[1]->print_self();
     cout << "remove list_1[1] by ptr" << endl;
-    list_1->remove(node);
+    list_1->remove((*list_1)[1]);
     list_1->print();
-    cout << endl;
-
-    auto *list_2 = new SinglyLinkedList<string>(string("boss"), string("dungeon"));
-    list_2->print();
-    cout << "insert `slave` after list_2->head" << endl;
-    list_2->insert(list_2->head, string("slave"));
-    list_2->print();
-    cout << "remove at pos `2`" << endl;
-    list_2->remove_at(2);
-    list_2->print();
-    cout << "remove `boss`" << endl;
-    list_2->remove(string("boss"));
-    list_2->print();
-    cout << "append `master`" << endl;
-    list_2->append(string("master"));
-    list_2->print();
-    cout << endl;
-
-    auto *list_3 = new SinglyLinkedList<bool, string, int, float, double>(false, 2.28, 3, 3.14f, 4, 5, string("69 gachiHYPER"));
-    cout << "list_3: \t";
-    list_3->print();
-    list_3->reverse();
-    cout << "reversed: \t";
-    list_3->print();
-    cout << endl;
-
-    auto *bool_list = new SinglyLinkedList<bool>(true, true, false);
-    auto *bool_list_2 = new SinglyLinkedList<bool>(true, false);
-
-    bool_list->print();
-    bool_list_2->print();
-
-    cout << "bool_list != bool_list_2: " << (*bool_list != *bool_list_2) << endl;
-    cout << "push true" << endl;
-    bool_list_2->push(true);
-
-    bool_list->print();
-    bool_list_2->print();
-
-    cout << "bool_list == bool_list_2: " << (*bool_list == *bool_list_2) << endl;
-
+    cout << "insert `true` after head" << endl;
+    list_1->insert(list_1->head, true);
+    list_1->print();
+    cout << "remove true by value" << endl;
+    list_1->remove(true);
+    list_1->print();
+    cout << "remove at 1" << endl;
+    list_1->remove_at(1);
+    list_1->print();
+    cout << "push 3.14f" << endl;
+    list_1->push(3.14f);
+    list_1->print();
+    cout << "reverse" << endl;
+    list_1->reverse();
+    list_1->print();
+    cout << "69 == 3.14: " << (list_1->head->data == list_1->head->next->data) << endl;
+    cout << "69 != 3.14: " << (list_1->head->data != list_1->head->next->data) << endl;
     delete list_1;
-    delete list_2;
-    delete list_3;
-    delete bool_list;
-    delete bool_list_2;
-
     return 0;
 }
