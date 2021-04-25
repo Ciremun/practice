@@ -275,27 +275,30 @@ int main()
     using SLL = SinglyLinkedList<int, float, string>;
     auto *list_1 = new SLL(69, 420.5f, string("dungeon master"));
     list_1->print();
-
     cout << "(*list_1)[2] == `dungeon master`: " << (get<string>(list_1->at(2)->data) == string("dungeon master")) << endl;
     cout << "size: " << list_1->size() << endl;
     cout << "contains `420.5f`: " << list_1->contains(420.5f) << endl;
-    cout << "list_1[0]: ";
+    cout << "print list_1[0]: ";
     (*list_1)[0]->print_self();
     cout << endl;
 
     auto *list_2 = new SinglyLinkedList<string>(string("boss"), string("dungeon"));
+    list_2->print();
+    cout << "insert `slave` after list_2->head" << endl;
     list_2->insert(list_2->head, string("slave"));
-    list_2->remove_at(1);
+    list_2->print();
+    cout << "remove at pos `2`" << endl;
+    list_2->remove_at(2);
+    list_2->print();
+    cout << "remove `boss`" << endl;
     list_2->remove(string("boss"));
+    list_2->print();
+    cout << "append `master`" << endl;
     list_2->append(string("master"));
     list_2->print();
-    cout << "size: " << list_2->size() << endl;
-    cout << "contains `slave`: " << list_2->contains(string("slave")) << endl;
-    cout << "list_2[1]: ";
-    (*list_2)[1]->print_self();
     cout << endl;
 
-    auto *list_3 = new SinglyLinkedList<bool, string, int, float>(false, string("second"), 3, 3.5f);
+    auto *list_3 = new SinglyLinkedList<bool, string, int, float, double>(false, 2.28, 3, 3.14f, 4, 5, string("69 gachiHYPER"));
     cout << "list_3: \t";
     list_3->print();
     list_3->reverse();
@@ -304,14 +307,14 @@ int main()
     cout << endl;
 
     auto *bool_list = new SinglyLinkedList<bool>(true, true, false);
-    auto *bool_list_2 = new SinglyLinkedList<bool>(true, false, false);
+    auto *bool_list_2 = new SinglyLinkedList<bool>(true, false);
 
     bool_list->print();
     bool_list_2->print();
 
     cout << "bool_list != bool_list_2: " << (*bool_list != *bool_list_2) << endl;
-    bool_list_2->insert(bool_list_2->head, true);
-    bool_list_2->remove_at(2);
+    cout << "push true" << endl;
+    bool_list_2->push(true);
 
     bool_list->print();
     bool_list_2->print();
