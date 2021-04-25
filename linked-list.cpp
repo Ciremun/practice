@@ -85,6 +85,11 @@ public:
         }
         cout << endl;
     }
+
+    void print_self() const
+    {
+        this->value([](auto &val) -> bool { cout << val << endl; return true; });
+    }
 };
 
 class SinglyLinkedList
@@ -320,7 +325,8 @@ int main()
     list_1->print();
     cout << "size: " << list_1->size() << endl;
     cout << "contains `420`: " << list_1->contains(420) << endl;
-    (*list_1)[0]->value([](auto &val){ cout << "list_1[0]: " <<  val << endl; return true; });
+    cout << "list_1[0]: ";
+    (*list_1)[0]->print_self();
     cout << endl;
 
     SinglyLinkedList *list_2 = new SinglyLinkedList(string("boss"), string("dungeon"));
@@ -331,7 +337,8 @@ int main()
     list_2->print();
     cout << "size: " << list_2->size() << endl;
     cout << "contains `master`: " << list_2->contains(string("master")) << endl;
-    (*list_2)[1]->value([](auto &val){ cout << "list_2[1]: " <<  val << endl; return true; });
+    cout << "list_2[1]: ";
+    (*list_2)[1]->print_self();
     cout << endl;
 
     SinglyLinkedList *list_3 = new SinglyLinkedList(false, string("second"), 3, 3.5f);
