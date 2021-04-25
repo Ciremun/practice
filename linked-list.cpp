@@ -3,16 +3,8 @@
 
 using namespace std;
 
-template<typename T>
+template <typename T>
 using base_type = typename remove_cv<typename remove_reference<T>::type>::type;
-
-enum class type
-{
-    int_type,
-    float_type,
-    string_type,
-    bool_type
-};
 
 class Node
 {
@@ -20,67 +12,21 @@ public:
     using Data = variant<int, float, string, bool>;
     Data data;
     Node *next;
-    type t;
 
     Node() {}
 
     template <typename T>
-    Node(const T &val, Node *nxt) : next(nxt), data(Data(val))
-    {
-        set_type(val);
-    }
+    Node(const T &val, Node *nxt) : next(nxt), data(Data(val)) {}
 
     template <typename T>
-    Node(T &&val, Node *nxt) : next(nxt), data(forward<T>(val))
-    {
-        set_type(val);
-    }
-
-    template <typename T>
-    void set_type(const T&val)
-    {
-        if (is_same_v<T, int>)
-        {
-            t = type::int_type;
-        }
-        else if (is_same_v<T, float>)
-        {
-            t = type::float_type;
-        }
-        else if (is_same_v<T, string>)
-        {
-            t = type::string_type;
-        }
-        else if (is_same_v<T, bool>)
-        {
-            t = type::bool_type;
-        }
-    }
-
-    template <typename F>
-    bool value(F callback) const
-    {
-        switch (this->t)
-        {
-            case type::int_type:
-                return callback(get<int>(this->data));
-            case type::float_type:
-                return callback(get<float>(this->data));
-            case type::string_type:
-                return callback(get<string>(this->data));
-            case type::bool_type:
-                return callback(get<bool>(this->data));
-            default:
-                return false;
-        }
-    }
+    Node(T &&val, Node *nxt) : next(nxt), data(forward<T>(val)) {}
 
     void print()
     {
         Node *node = this;
         while (node != NULL)
         {
-            node->value([](auto &val) -> bool { cout << val << " "; return true; });
+            visit([](auto&&val){ cout << val << " "; }, node->data);
             node = node->next;
         }
         cout << endl;
@@ -88,7 +34,7 @@ public:
 
     void print_self() const
     {
-        this->value([](auto &val) -> bool { cout << val << endl; return true; });
+        visit([](auto &&val){ cout << val << endl; }, data);
     }
 };
 
@@ -154,25 +100,23 @@ public:
     void remove(T data)
     {
         Node *temp = head;
-        if (temp != NULL && temp->value([&data](auto &val) -> bool
-        {
-            if constexpr (is_same_v<T, base_type<decltype(val)>>)
-            {
-                return val == data;
-            }
-            else
-            {
-                return false;
-            }
-        }))
+        if (temp != NULL && visit([&data](auto &&val) -> bool {
+                if constexpr (is_same_v<T, base_type<decltype(val)>>)
+                {
+                    return val == data;
+                }
+                else
+                {
+                    return false;
+                }
+            }, temp->data))
         {
             head = temp->next;
             delete temp;
             return;
         }
         Node *prev = NULL;
-        while (temp != NULL && temp->value([&data](auto &val) -> bool
-        {
+        while (temp != NULL && visit([&data](auto &&val) -> bool {
             if constexpr (is_same_v<T, base_type<decltype(val)>>)
             {
                 return val != data;
@@ -181,7 +125,7 @@ public:
             {
                 return true;
             }
-        }))
+        }, temp->data))
         {
             prev = temp;
             temp = temp->next;
@@ -258,17 +202,16 @@ public:
         Node *current = head;
         while (current != NULL)
         {
-            if (current->value([&data](auto &val) -> bool
-            {
-                if constexpr (is_same_v<T, base_type<decltype(val)>>)
-                {
-                    return val == data;
-                }
-                else
-                {
-                    return false;
-                }
-            }))
+            if (visit([&data](auto &&val) -> bool {
+                    if constexpr (is_same_v<T, base_type<decltype(val)>>)
+                    {
+                        return val == data;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }, current->data))
             {
                 return true;
             }
@@ -320,11 +263,9 @@ public:
 int main()
 {
     SinglyLinkedList *list_1 = new SinglyLinkedList(69, 420.5f, string("dungeon master"));
-    list_1->remove(420);
-    list_1->remove(1337);
     list_1->print();
     cout << "size: " << list_1->size() << endl;
-    cout << "contains `420`: " << list_1->contains(420) << endl;
+    cout << "contains `420.5f`: " << list_1->contains(420.5f) << endl;
     cout << "list_1[0]: ";
     (*list_1)[0]->print_self();
     cout << endl;
@@ -336,7 +277,7 @@ int main()
     list_2->append(string("master"));
     list_2->print();
     cout << "size: " << list_2->size() << endl;
-    cout << "contains `master`: " << list_2->contains(string("master")) << endl;
+    cout << "contains `slave`: " << list_2->contains(string("slave")) << endl;
     cout << "list_2[1]: ";
     (*list_2)[1]->print_self();
     cout << endl;
