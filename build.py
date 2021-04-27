@@ -11,6 +11,7 @@ for v in 'CC', 'CXX':
     setattr(sys.modules[__name__], v, os.environ.get(v))
 
 RC = 'rustc'
+KC = 'kotlinc.bat' if sys.platform == 'win32' else 'kotlinc'
 
 DIR = os.listdir('.')
 build_functions = {}
@@ -101,6 +102,12 @@ def build_rust_source(src: str):
 @build_function('cpp')
 def build_cpp_source(src: str):
     build_c_source(src, 'CXX')
+
+
+@build_function('kt')
+def build_kt_source(src: str):
+    run_command([KC, src, "-include-runtime", "-d",
+                f'{src[:-len(extract_source_extension(src))-1]}.jar'])
 
 
 @catch_errors
