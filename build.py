@@ -113,8 +113,8 @@ def build_kt_source(src: str) -> None:
                 f'{src[:-len(extract_source_extension(src))-1]}.jar'])
 
 
-@catch_errors
 @build_function('asm')
+@catch_errors
 def build_asm_source(src: str) -> None:
     if sys.platform == 'win32':
         raise NotImplementedError('build_asm_source is not supported on Windows')
