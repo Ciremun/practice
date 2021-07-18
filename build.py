@@ -121,7 +121,8 @@ def build_asm_source(src: str) -> None:
     if sys.maxsize <= 2**32:
         raise NotImplementedError('build_asm_source is not supported on 32-bit systems')
     run_command(['nasm', '-felf64', src])
-    run_command([CC, f'{src[:-len(extract_source_extension(src))-1]}.o', '-orot13'])
+    filename = src[:-len(extract_source_extension(src))-1]
+    run_command([CC, f'{filename}.o', f'-o{filename}'])
 
 @catch_errors
 def run_command(command: List[str]) -> CompletedProcess:
