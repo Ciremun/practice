@@ -6,6 +6,8 @@ import sys
 import os
 
 from typing import Callable, Any, Optional, List
+from subprocess import CompletedProcess
+from functools import wraps
 
 for v in 'CC', 'CXX':
     setattr(sys.modules[__name__], v, os.environ.get(v))
@@ -21,22 +23,23 @@ compilers_and_flags = {
 }
 
 
-def msvc(C: str):
+def msvc(C: str) -> bool:
     C = getattr(sys.modules[__name__], C)
     return any(C == cl for cl in ('cl', 'cl.exe'))
 
 
 def build_function(ext: str) -> Callable:
     def decorator(func: Callable) -> Callable:
+        @wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             return func(*args, **kwargs)
-        wrapper.__name__ = func.__name__
         build_functions[ext] = wrapper
         return wrapper
     return decorator
 
 
 def catch_errors(func: Callable) -> Callable:
+    @wraps(func)
     def wrapper(*args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
@@ -46,7 +49,7 @@ def catch_errors(func: Callable) -> Callable:
     return wrapper
 
 
-def log_error(err: str):
+def log_error(err: str) -> None:
     print(f'ERROR: {err}')
 
 
@@ -63,7 +66,7 @@ def extract_source_extension(src: str) -> Optional[str]:
     return None
 
 
-def build_source(src: str):
+def build_source(src: str) -> None:
     ext = extract_source_extension(src)
     if ext:
         bf = build_functions.get(ext)
@@ -83,7 +86,7 @@ def get_compiler_command(C: str) -> List[str]:
 
 
 @build_function('c')
-def build_c_source(src: str, C: str = 'CC'):
+def build_c_source(src: str, C: str = 'CC') -> None:
     command = get_compiler_command(C)
     command.append(src)
     filename = src[:-len(extract_source_extension(src))-1]
@@ -95,35 +98,45 @@ def build_c_source(src: str, C: str = 'CC'):
 
 
 @build_function('rs')
-def build_rust_source(src: str):
+def build_rust_source(src: str) -> None:
     run_command([RC, src])
 
 
 @build_function('cpp')
-def build_cpp_source(src: str):
+def build_cpp_source(src: str) -> None:
     build_c_source(src, 'CXX')
 
 
 @build_function('kt')
-def build_kt_source(src: str):
+def build_kt_source(src: str) -> None:
     run_command([KC, src, "-include-runtime", "-d",
                 f'{src[:-len(extract_source_extension(src))-1]}.jar'])
 
 
 @catch_errors
-def run_command(command: List[str]):
+@build_function('asm')
+def build_asm_source(src: str) -> None:
+    if sys.platform == 'win32':
+        raise NotImplementedError('build_asm_source is not supported on Windows')
+    if sys.maxsize <= 2**32:
+        raise NotImplementedError('build_asm_source is not supported on 32-bit systems')
+    run_command(['nasm', '-felf64', src])
+    run_command([CC, f'{src[:-len(extract_source_extension(src))-1]}.o', '-orot13'])
+
+@catch_errors
+def run_command(command: List[str]) -> CompletedProcess:
     print(' '.join(command))
-    subprocess.run(command)
+    return subprocess.run(command)
 
 
-def build_all():
+def build_all() -> None:
     SOURCES = [s for e in list(build_functions.keys())
                for s in DIR if s.endswith(f'.{e}')]
     for src in SOURCES:
         build_source(src)
 
 
-def build_all_with_extension(src: str):
+def build_all_with_extension(src: str) -> None:
     ext = extract_source_extension(src)
     if ext:
         bf = build_functions.get(ext)
@@ -136,7 +149,7 @@ def build_all_with_extension(src: str):
             log_error(f'`{src}` unknown file extension: `.{ext}`')
 
 
-def add_compiler_flag(C: str, flag: str):
+def add_compiler_flag(C: str, flag: str) -> None:
     flags = compilers_and_flags[C]
     if flags is None:
         flags = flag

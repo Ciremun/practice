@@ -4,8 +4,10 @@
 *.exe
 *.pdb
 *.jar
+*.o
 
 binary-search
 quick-sort
 linked-list
 circular-buffer
+rot13
